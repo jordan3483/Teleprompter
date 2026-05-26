@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Nature Narration Coach - Cadence Edition</title>
+<style>
+:root{--bg:#10140f;--panel:#1b2418;--text:#f4f1df;--muted:#c9c4a8;--accent:#d6b45c;--accent2:#8faa5b;--danger:#b85b4d;--good:#6fa35f;--blue:#8fc7d9;--red:#d97d72;--green:#a8c77a;--gray:#b9b49c}
+body{margin:0;font-family:Georgia,"Times New Roman",serif;background:radial-gradient(circle at top,#26331f,var(--bg));color:var(--text)}
+.wrap{max-width:980px;margin:auto;padding:18px}
+h1{text-align:center;color:var(--accent);margin-bottom:4px}
+.subtitle{text-align:center;color:var(--muted);margin-bottom:20px}
+.card{background:rgba(27,36,24,.96);border:1px solid #3b4b31;border-radius:18px;padding:18px;margin-bottom:18px;box-shadow:0 8px 18px rgba(0,0,0,.35)}
+label{display:block;color:var(--accent);margin-bottom:8px;font-weight:bold}
+textarea{width:100%;box-sizing:border-box;border-radius:14px;border:1px solid #526242;background:#10160f;color:var(--text);padding:16px;font-size:1.08rem;font-family:Georgia,"Times New Roman",serif;line-height:1.7;min-height:360px;resize:vertical}
+button{border:none;border-radius:12px;padding:11px 14px;margin:5px 5px 5px 0;background:var(--accent2);color:#10140f;font-weight:bold;cursor:pointer}
+button:hover{filter:brightness(1.06)} button:disabled{opacity:.45;cursor:not-allowed}
+.gold{background:var(--accent)}.danger{background:var(--danger);color:white}.dark{background:#3b4b31;color:var(--text)}.good{background:var(--good);color:#081008}.blue{background:#5f91a0;color:#061013}.red{background:#b8645d;color:white}
+.small{color:var(--muted);font-size:.92rem;line-height:1.45}.sectionTitle{color:var(--muted);margin-top:12px;margin-bottom:4px;font-size:.95rem}
+.coachBox{white-space:pre-wrap;background:#0d130c;border:1px dashed #6d7e4f;border-radius:14px;padding:16px;min-height:140px;line-height:1.8}
+.teleprompterShell{background:#040604;border:2px solid #526242;border-radius:18px;height:440px;overflow:hidden;position:relative;margin-top:12px;box-shadow:inset 0 0 35px rgba(0,0,0,.75)}
+.teleprompterText{white-space:pre-wrap;line-height:1.9;padding:230px 30px 270px;font-size:28px;text-align:center}
+.readingLine{position:absolute;top:50%;left:0;right:0;border-top:2px solid rgba(214,180,92,.75);pointer-events:none}
+.cue{color:#e0b34e;font-weight:900;font-style:italic;letter-spacing:.5px}.rise{color:var(--blue);font-weight:900;text-shadow:0 0 8px rgba(143,199,217,.35)}.fall{color:var(--green);font-weight:900;text-shadow:0 0 8px rgba(168,199,122,.3)}.drop{color:var(--red);font-weight:900;text-shadow:0 0 8px rgba(217,125,114,.35)}.breath{color:var(--gray);font-weight:900;font-style:italic}.tone{color:#e0b34e;font-weight:900;text-transform:uppercase;border-bottom:1px solid rgba(224,179,78,.7)}.wave{color:#d8c98a;font-weight:900;letter-spacing:4px}
+audio{width:100%;margin-top:10px}.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:14px}.controlBox{background:#10160f;border:1px solid #3b4b31;border-radius:12px;padding:10px}.valueText{color:var(--accent);font-weight:bold}.status,.savedItem{background:#10160f;border:1px solid #3b4b31;border-radius:12px;padding:10px;margin-top:10px}.estimateGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:10px}.estimateBox{background:#10160f;border:1px solid #3b4b31;border-radius:12px;padding:12px;text-align:center}.estimateTime{font-size:1.55rem;color:var(--accent);font-weight:bold}.meter{height:14px;background:#10160f;border:1px solid #3b4b31;border-radius:999px;overflow:hidden;margin-top:10px}.meterFill{height:100%;width:0%;background:var(--good);transition:.2s}.targetNote{margin-top:8px;color:var(--muted);font-size:.92rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Nature Narration Coach</h1>
+<div class="subtitle">Cadence edition: train pitch arcs, breath placement, pacing, and documentary-style narration.</div>
+
+<div class="card">
+<label>Practice Script</label>
+<textarea id="scriptBox" oninput="updateEstimate()">And now… ↗
+early in the morning...
+before the heat of the day arrives...
+the beekeeper approaches the colony. ↘
+
+[QUIET AWE]
+Inside...
+thousands of workers continue their endless labor. ~~~
+
+But there is a problem. ⤵
+
+Unaware of the danger…
+the beekeeper reaches for the wrong frame. ↗
+
+[BREATH RESET] ⬤
+What happens next…
+will determine the fate of the colony. ↘</textarea>
+
+<div class="sectionTitle">Action Cues</div>
+<button onclick="insertCue('[PAUSE]')">[PAUSE]</button><button onclick="insertCue('[DRAMATIC PAUSE]')">[DRAMATIC PAUSE]</button><button onclick="insertCue('[SLOW DOWN]')">[SLOW DOWN]</button><button onclick="insertCue('[EMPHASIS]')">[EMPHASIS]</button><button onclick="insertCue('[SOFTER]')">[SOFTER]</button><button onclick="insertCue('[QUIET WONDER]')">[QUIET WONDER]</button><button onclick="insertCue('[TRAILING OFF]')">[TRAILING OFF]</button>
+
+<div class="sectionTitle">Documentary Phrase Inserts</div>
+<button class="dark" onclick="insertPhrase('And now…')">And now…</button><button class="dark" onclick="insertPhrase('For the first time…')">For the first time…</button><button class="dark" onclick="insertPhrase('Remarkably…')">Remarkably…</button><button class="dark" onclick="insertPhrase('What happens next…')">What happens next…</button><button class="dark" onclick="insertPhrase('But there is a problem.')">But there is a problem.</button><button class="dark" onclick="insertPhrase('Unaware of the danger…')">Unaware of the danger…</button>
+
+<div class="sectionTitle">Cadence Markup</div>
+<button class="blue" onclick="insertCue('↗')">↗ Rising Curiosity</button><button class="good" onclick="insertCue('↘')">↘ Falling Resolution</button><button class="red" onclick="insertCue('⤵')">⤵ Dramatic Drop</button><button class="dark" onclick="insertCue('˘')">˘ Quick Breath</button><button class="dark" onclick="insertCue('⬤')">⬤ Full Breath Reset</button><button class="gold" onclick="insertCue('~~~')">~~~ Gentle Wave</button>
+
+<div class="sectionTitle">Tone Tags</div>
+<button onclick="insertCue('[QUIET AWE]')">[QUIET AWE]</button><button onclick="insertCue('[TENSION RISING]')">[TENSION RISING]</button><button onclick="insertCue('[OBSERVATIONAL]')">[OBSERVATIONAL]</button><button onclick="insertCue('[GRAVE CONCERN]')">[GRAVE CONCERN]</button><button onclick="insertCue('[WHISPERED DISCOVERY]')">[WHISPERED DISCOVERY]</button>
+
+<br><button class="gold" onclick="coachScript()">Coach This Script</button><button class="dark" onclick="clearScript()">Clear</button>
+</div>
+
+<div class="card">
+<label>Estimated Narration Length</label>
+<div class="small">Updates as you type. Estimates account for words, pauses, breath resets, dramatic pauses, and cadence markers.</div>
+
+<div class="estimateGrid">
+  <div class="estimateBox">
+    <div class="small">Words</div>
+    <div class="estimateTime" id="wordCount">0</div>
+  </div>
+  <div class="estimateBox">
+    <div class="small">Standard</div>
+    <div class="estimateTime" id="standardTime">0:00</div>
+  </div>
+  <div class="estimateBox">
+    <div class="small">Calm Documentary</div>
+    <div class="estimateTime" id="docTime">0:00</div>
+  </div>
+  <div class="estimateBox">
+    <div class="small">Dramatic Slow Build</div>
+    <div class="estimateTime" id="dramaticTime">0:00</div>
+  </div>
+</div>
+
+<div class="meter"><div class="meterFill" id="durationMeter"></div></div>
+<div class="targetNote" id="targetNote">Target guide: under 60 seconds is usually ideal for short reels.</div>
+</div>
+
+<div class="card">
+<label>Coach Mode Output</label>
+<div id="coachOutput" class="coachBox">Your coached script will appear here.</div>
+<button onclick="copyCoach()">Copy Coached Script</button><button onclick="sendCoachToEditor()">Send to Editor</button>
+</div>
+
+<div class="card">
+<label>Teleprompter + Recorder</label>
+<button class="gold" onclick="loadScriptToTeleprompter()">Load Script</button><button class="gold" onclick="loadCoachToTeleprompter()">Load Coached Script</button>
+<button class="good" onclick="startTeleprompter()">Start Scroll + Record</button><button class="dark" onclick="pauseTeleprompter()">Pause Scroll</button><button class="danger" onclick="resetTeleprompter()">Reset</button>
+<br><br>
+<button id="startBtn" class="gold" onclick="startRecording()">Start Recording</button><button id="stopBtn" class="danger" onclick="stopRecording()" disabled>Stop Recording</button><button id="downloadBtn" onclick="downloadRecording()" disabled>Download WAV</button>
+<audio id="audioPlayback" controls></audio>
+<div id="recordStatus" class="status small">Recorder idle.</div>
+<div class="teleprompterShell" id="teleShell"><div class="readingLine"></div><div class="teleprompterText" id="teleText">Load a script to begin.</div></div>
+<div class="controls">
+<div class="controlBox"><label>Scroll Speed: <span class="valueText" id="speedValue">1.0</span></label><input id="speedSlider" type="range" min="0.2" max="4" step="0.1" value="1" oninput="updateTeleSettings()"></div>
+<div class="controlBox"><label>Font Size: <span class="valueText" id="fontValue">28</span> px</label><input id="fontSlider" type="range" min="12" max="72" step="1" value="28" oninput="updateTeleSettings()"></div>
+</div>
+</div>
+
+<div class="card">
+<label>Cadence Legend</label>
+<div class="small">
+<span class="rise">↗ Rising Curiosity</span> = lift pitch slightly and leave the thought unresolved.<br>
+<span class="fall">↘ Falling Resolution</span> = lower pitch and land calmly.<br>
+<span class="drop">⤵ Dramatic Drop</span> = lower sharply for danger, consequence, or serious reveal.<br>
+<span class="breath">˘ Quick Breath</span> = small breath without fully stopping.<br>
+<span class="breath">⬤ Full Breath Reset</span> = reset posture and breath before the next phrase.<br>
+<span class="wave">~~~ Gentle Wave</span> = smooth, flowing documentary rhythm.
+</div>
+</div>
+
+<div class="card">
+<label>Practice Prompts</label>
+<button onclick="loadPrompt('bee')">Bee Yard Discovery</button><button onclick="loadPrompt('tool')">Lost Hive Tool</button><button onclick="loadPrompt('coffee')">Making Coffee</button><button onclick="loadPrompt('oak')">Mighty Oak</button><button onclick="loadPrompt('queen')">Queen Inspection</button><button onclick="loadPrompt('dramatic')">Dramatic Reveal</button><button onclick="loadPrompt('cadence')">Cadence Sample</button>
+</div>
+
+<div class="card">
+<label>Saved Practice Sessions</label>
+<button onclick="saveSession()">Save Session</button><button class="danger" onclick="clearSaved()">Clear Saved</button>
+<div id="savedList"></div>
+</div>
+</div>
+
+<script>
+let mediaRecorder=null,mediaStream=null,audioChunks=[],latestAudioBlob=null,latestAudioUrl=null,teleInterval=null,teleScroll=0;
+
+function insertCue(cue){const b=document.getElementById("scriptBox"),s=b.selectionStart,e=b.selectionEnd,t=b.value,i=" "+cue+" ";b.value=t.substring(0,s)+i+t.substring(e);b.focus();b.selectionStart=b.selectionEnd=s+i.length;updateEstimate()}
+function insertPhrase(phrase){const b=document.getElementById("scriptBox"),s=b.selectionStart,e=b.selectionEnd,t=b.value,i=phrase+" ";b.value=t.substring(0,s)+i+t.substring(e);b.focus();b.selectionStart=b.selectionEnd=s+i.length;updateEstimate()}
+function clearScript(){document.getElementById("scriptBox").value="";updateEstimate()}
+
+function coachScript(){
+ const script=document.getElementById("scriptBox").value.trim();
+ if(!script){document.getElementById("coachOutput").textContent="Add a script first.";return}
+ let lines=script.replace(/\.\s+/g,"...\n").split("\n").map(l=>l.trim()).filter(Boolean),coached=[];
+ coached.push("[SOFTER] [OBSERVATIONAL] Begin calmly. ⬤\n");
+ lines.forEach((line,i)=>{let n=line;if(i===0&&!n.includes("↗"))n="[SLOW DOWN] "+n+" ↗";if(i===Math.floor(lines.length/2))coached.push("[TENSION RISING] ⬤");coached.push(n);if(line.length<38&&!line.includes("[PAUSE]"))coached.push("[PAUSE] ˘")});
+ coached.push("\n[EMPHASIS] Land the final phrase gently. ↘");
+ document.getElementById("coachOutput").textContent=coached.join("\n")
+}
+function copyCoach(){navigator.clipboard.writeText(document.getElementById("coachOutput").textContent);setStatus("Coached script copied.")}
+function sendCoachToEditor(){document.getElementById("scriptBox").value=document.getElementById("coachOutput").textContent}
+function escapeHtml(text){return text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function cueify(text){
+ let h=escapeHtml(text);
+ return h.replace(/\[DRAMATIC PAUSE\]/g,'<span class="cue">— DRAMATIC PAUSE —</span>').replace(/\[PAUSE\]/g,'<span class="cue">— PAUSE —</span>').replace(/\[SLOW DOWN\]/g,'<span class="cue">[SLOW DOWN]</span>').replace(/\[EMPHASIS\]/g,'<span class="cue">[EMPHASIS]</span>').replace(/\[SOFTER\]/g,'<span class="cue">[SOFTER]</span>').replace(/\[QUIET WONDER\]/g,'<span class="cue">[QUIET WONDER]</span>').replace(/\[TRAILING OFF\]/g,'<span class="cue">[TRAILING OFF]</span>').replace(/\[QUIET AWE\]/g,'<span class="tone">[QUIET AWE]</span>').replace(/\[TENSION RISING\]/g,'<span class="tone">[TENSION RISING]</span>').replace(/\[OBSERVATIONAL\]/g,'<span class="tone">[OBSERVATIONAL]</span>').replace(/\[GRAVE CONCERN\]/g,'<span class="tone">[GRAVE CONCERN]</span>').replace(/\[WHISPERED DISCOVERY\]/g,'<span class="tone">[WHISPERED DISCOVERY]</span>').replace(/\[BREATH RESET\]/g,'<span class="breath">[BREATH RESET]</span>').replace(/↗/g,'<span class="rise">↗</span>').replace(/↘/g,'<span class="fall">↘</span>').replace(/⤵/g,'<span class="drop">⤵</span>').replace(/˘/g,'<span class="breath">˘</span>').replace(/⬤/g,'<span class="breath">⬤</span>').replace(/~~~/g,'<span class="wave">~~~</span>')
+}
+function loadScriptToTeleprompter(){document.getElementById("teleText").innerHTML=cueify(document.getElementById("scriptBox").value);resetTeleprompter()}
+function loadCoachToTeleprompter(){document.getElementById("teleText").innerHTML=cueify(document.getElementById("coachOutput").textContent);resetTeleprompter()}
+async function startTeleprompter(){pauseTeleprompter();if(!mediaRecorder||mediaRecorder.state!=="recording")await startRecording();const sh=document.getElementById("teleShell"),sp=parseFloat(document.getElementById("speedSlider").value);teleInterval=setInterval(()=>{teleScroll+=sp;sh.scrollTop=teleScroll;if(sh.scrollTop+sh.clientHeight>=sh.scrollHeight-5){pauseTeleprompter();setStatus("Teleprompter finished. Recording is still active. Press Stop Recording when done.")}},40)}
+function pauseTeleprompter(){if(teleInterval){clearInterval(teleInterval);teleInterval=null}}
+function resetTeleprompter(){pauseTeleprompter();teleScroll=0;document.getElementById("teleShell").scrollTop=0}
+function updateTeleSettings(){const sp=document.getElementById("speedSlider").value,fs=document.getElementById("fontSlider").value;document.getElementById("speedValue").textContent=sp;document.getElementById("fontValue").textContent=fs;document.getElementById("teleText").style.fontSize=fs+"px"}
+function setStatus(m){document.getElementById("recordStatus").textContent=m}
+function setRecordingButtons(r){document.getElementById("startBtn").disabled=r;document.getElementById("stopBtn").disabled=!r}
+function getSupportedMimeType(){for(const t of["audio/webm;codecs=opus","audio/webm","audio/mp4"]){if(window.MediaRecorder&&MediaRecorder.isTypeSupported(t))return t}return""}
+async function startRecording(){
+ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){setStatus("Recording is not supported in this browser.");return}
+ if(!window.MediaRecorder){setStatus("MediaRecorder is not supported in this browser.");return}
+ try{audioChunks=[];if(latestAudioUrl){URL.revokeObjectURL(latestAudioUrl);latestAudioUrl=null}document.getElementById("downloadBtn").disabled=true;mediaStream=await navigator.mediaDevices.getUserMedia({audio:true});const mt=getSupportedMimeType();mediaRecorder=mt?new MediaRecorder(mediaStream,{mimeType:mt}):new MediaRecorder(mediaStream);mediaRecorder.ondataavailable=e=>{if(e.data.size>0)audioChunks.push(e.data)};mediaRecorder.onstop=()=>{latestAudioBlob=new Blob(audioChunks,{type:mediaRecorder.mimeType||"audio/webm"});latestAudioUrl=URL.createObjectURL(latestAudioBlob);const a=document.getElementById("audioPlayback");a.src=latestAudioUrl;a.load();document.getElementById("downloadBtn").disabled=false;setStatus("Recording stopped. Playback is ready.");cleanupRecording();setRecordingButtons(false)};mediaRecorder.start(250);setRecordingButtons(true);setStatus("Recording...")}catch(err){setStatus("Microphone access failed.");cleanupRecording();setRecordingButtons(false)}
+}
+function stopRecording(){if(mediaRecorder&&mediaRecorder.state==="recording")mediaRecorder.stop();else setStatus("No active recording to stop.")}
+function cleanupRecording(){if(mediaStream){mediaStream.getTracks().forEach(tr=>tr.stop());mediaStream=null}}
+
+async function blobToWav(blob){
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  const audioContext = new AudioContextClass();
+  const arrayBuffer = await blob.arrayBuffer();
+  const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+  const wavBuffer = audioBufferToWav(audioBuffer);
+  await audioContext.close();
+  return new Blob([wavBuffer], {type:"audio/wav"});
+}
+
+function audioBufferToWav(buffer){
+  const numChannels = buffer.numberOfChannels;
+  const sampleRate = buffer.sampleRate;
+  const format = 1;
+  const bitDepth = 16;
+  const bytesPerSample = bitDepth / 8;
+  const blockAlign = numChannels * bytesPerSample;
+  const length = buffer.length * blockAlign;
+  const arrayBuffer = new ArrayBuffer(44 + length);
+  const view = new DataView(arrayBuffer);
+  const channels = [];
+
+  let pos = 0;
+
+  function writeString(str){
+    for(let i=0;i<str.length;i++){
+      view.setUint8(pos++, str.charCodeAt(i));
+    }
+  }
+
+  function writeUint32(data){
+    view.setUint32(pos, data, true);
+    pos += 4;
+  }
+
+  function writeUint16(data){
+    view.setUint16(pos, data, true);
+    pos += 2;
+  }
+
+  writeString("RIFF");
+  writeUint32(36 + length);
+  writeString("WAVE");
+  writeString("fmt ");
+  writeUint32(16);
+  writeUint16(format);
+  writeUint16(numChannels);
+  writeUint32(sampleRate);
+  writeUint32(sampleRate * blockAlign);
+  writeUint16(blockAlign);
+  writeUint16(bitDepth);
+  writeString("data");
+  writeUint32(length);
+
+  for(let i=0;i<numChannels;i++){
+    channels.push(buffer.getChannelData(i));
+  }
+
+  for(let i=0;i<buffer.length;i++){
+    for(let channel=0;channel<numChannels;channel++){
+      let sample = Math.max(-1, Math.min(1, channels[channel][i]));
+      sample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+      view.setInt16(pos, sample, true);
+      pos += 2;
+    }
+  }
+
+  return arrayBuffer;
+}
+
+async function downloadRecording(){
+  if(!latestAudioBlob){
+    setStatus("No recording available yet.");
+    return;
+  }
+
+  setStatus("Converting recording to WAV...");
+
+  try{
+    const wavBlob = await blobToWav(latestAudioBlob);
+    const wavUrl = URL.createObjectURL(wavBlob);
+
+    const a=document.createElement("a");
+    a.href=wavUrl;
+    a.download="narration_practice.wav";
+
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    setStatus("WAV download started.");
+  }catch(err){
+    setStatus("WAV conversion failed. Try recording again or use a desktop browser.");
+  }
+}
+
+function stripMarkupForWords(text){
+ return text
+  .replace(/\[[^\]]+\]/g," ")
+  .replace(/[↗↘⤵˘⬤~]/g," ")
+  .replace(/[—–]/g," ")
+  .trim()
+}
+function countMatches(text,regex){const m=text.match(regex);return m?m.length:0}
+function formatTime(seconds){
+ seconds=Math.max(0,Math.round(seconds));
+ const m=Math.floor(seconds/60);
+ const s=seconds%60;
+ return m+":"+String(s).padStart(2,"0")
+}
+function estimateSeconds(text,wpm){
+ const clean=stripMarkupForWords(text);
+ const words=clean?clean.split(/\s+/).filter(Boolean).length:0;
+ let seconds=(words/wpm)*60;
+
+ seconds+=countMatches(text,/\[PAUSE\]/g)*0.8;
+ seconds+=countMatches(text,/\[DRAMATIC PAUSE\]/g)*1.8;
+ seconds+=countMatches(text,/⬤/g)*1.0;
+ seconds+=countMatches(text,/˘/g)*0.35;
+ seconds+=countMatches(text,/↗/g)*0.25;
+ seconds+=countMatches(text,/↘/g)*0.25;
+ seconds+=countMatches(text,/⤵/g)*0.6;
+ seconds+=countMatches(text,/~~~/g)*0.75;
+
+ return {words,seconds};
+}
+function updateEstimate(){
+ const text=document.getElementById("scriptBox").value || "";
+ const standard=estimateSeconds(text,145);
+ const doc=estimateSeconds(text,115);
+ const dramatic=estimateSeconds(text,95);
+
+ document.getElementById("wordCount").textContent=standard.words;
+ document.getElementById("standardTime").textContent=formatTime(standard.seconds);
+ document.getElementById("docTime").textContent=formatTime(doc.seconds);
+ document.getElementById("dramaticTime").textContent=formatTime(dramatic.seconds);
+
+ const meter=document.getElementById("durationMeter");
+ const note=document.getElementById("targetNote");
+ const pct=Math.min(100,(doc.seconds/90)*100);
+ meter.style.width=pct+"%";
+
+ if(doc.seconds<=60){
+   meter.style.background="var(--good)";
+   note.textContent="Good reel range: calm documentary estimate is under 60 seconds.";
+ }else if(doc.seconds<=90){
+   meter.style.background="var(--accent)";
+   note.textContent="Longer reel range: this should still work, but pacing will feel slower.";
+ }else{
+   meter.style.background="var(--danger)";
+   note.textContent="Over 90 seconds at calm documentary pace. Consider trimming or increasing scroll speed.";
+ }
+}
+
+window.addEventListener("beforeunload",()=>{cleanupRecording();pauseTeleprompter()});
+updateTeleSettings();loadSaved();updateEstimate();
+</script>
+</body>
+</html>
